@@ -1,0 +1,121 @@
+generator client {
+    provider        = "prisma-client-js"
+    previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+    provider = "postgresql"
+}
+
+// 1. Matchmaker Agent Model (For Panel Login)
+model Matchmaker {
+    id           Int      @id @default(autoincrement())
+    name         String
+    email        String   @unique
+    passwordHash String   @map("password_hash")
+    createdAt    DateTime @default(now()) @map("created_at")
+    notes        Note[] // Tracks which matchmaker wrote which internal note
+
+    @@map("matchmakers")
+}
+
+// 2. Comprehensive Client / Candidate Pool Model
+model Client {
+    id Int @id @default(autoincrement())
+
+    // THE KEY FLAG: 
+    // FALSE = Real customer appearing on the main Matchmaker Dashboard panel
+    // TRUE  = Background pool profile used to simulate matching options
+    isDummy Boolean @default(false) @map("is_dummy")
+
+    // Basic Structural Fields
+    firstName     String   @map("first_name")
+    lastName      String   @map("last_name")
+    gender        String // "Male" or "Female"
+    dateOfBirth   DateTime @map("date_of_birth")
+    heightCm      Int      @map("height_cm")
+    maritalStatus String   @default("Never Married") @map("marital_status")
+
+    // Contact Info (Optional/Null for the dummy pool generation)
+    email       String? @unique
+    phoneNumber String? @map("phone_number")
+    country     String  @default("India")
+    city        String
+
+    // Professional / Career Vectors
+    ugCollege       String? @map("ug_college")
+    degree          String?
+    currentCompany  String? @map("current_company")
+    designation     String?
+    annualIncomeInr BigInt  @map("annual_income_inr") // Uses BigInt to easily store Indian Rupee figures safely
+
+    // Cultural & Lifestyle Matrix (Essential for Indian Matchmaking space)
+    religion       String
+    caste          String?
+    motherTongue   String  @default("Hindi") @map("mother_tongue")
+    dietPreference String  @map("diet_preference") // "Pure Veg", "Eggetarian", "Non-Veg", "Jain"
+    manglikStatus  String  @default("No") @map("manglik_status")
+    familyValues   String  @default("Moderate") @map("family_values") // "Traditional", "Moderate", "Liberal"
+    siblings       String? // Quick text summary of siblings
+
+    // Soft Rules & Lifestyle Preferences
+    wantKids       String @map("want_kids") // "Yes", "No", "Maybe"
+    openToRelocate String @map("open_to_relocate") // "Yes", "No", "Maybe"
+    openToPets     String @map("open_to_pets") // "Yes", "No", "Maybe"
+
+    // Pipeline Journey Tracker[cite: 1]
+    journeyStatus String   @default("Onboarding") @map("journey_status") // e.g., "Profile Verified", "Searching Matches", "Intro Sent"[cite: 1]
+    createdAt     DateTime @default(now()) @map("created_at")
+
+    // Relations
+    notes Note[] // A client can have many historical timeline notes[cite: 1]
+    // matches Match[]
+
+    // CACHING PIPELINE RELATIONS:
+    // Tracks matches where this client is receiving the recommendation array
+    initiatedMatches Match[] @relation("ClientMatches")
+    // Tracks matches where this client's profile is the candidate being recommended to someone else
+    receivedMatches  Match[] @relation("CandidateMatches")
+
+    @@map("clients")
+}
+
+// 3. Notes Engine Schema (For Recording Client Call Logs)
+model Note {
+    id           Int        @id @default(autoincrement())
+    clientId     Int        @map("client_id")
+    client       Client     @relation(fields: [clientId], references: [id], onDelete: Cascade)
+    matchmakerId Int        @map("matchmaker_id")
+    matchmaker   Matchmaker @relation(fields: [matchmakerId], references: [id], onDelete: Cascade)
+    content      String     @db.Text // Holds the text block from meetings/calls[cite: 1]
+    createdAt    DateTime   @default(now()) @map("created_at")
+
+    @@map("notes")
+}
+
+// 4. Automated AI Matching Cache & Pipeline Tracking Model
+model Match {
+    id Int @id @default(autoincrement())
+
+    // Relation back to the primary target search client
+    clientId Int    @map("client_id")
+    client   Client @relation("ClientMatches", fields: [clientId], references: [id], onDelete: Cascade)
+
+    // Relation back to the matched pool profile candidate
+    candidateId Int    @map("candidate_id")
+    candidate   Client @relation("CandidateMatches", fields: [candidateId], references: [id], onDelete: Cascade)
+
+    // Storing semantic evaluation parameters from OpenRouter responses permanently
+    compatibilityScore Int    @map("compatibility_score")
+    explanation        String @db.Text
+    emailIntroSnippet  String @map("email_intro_snippet") @db.Text
+
+    // Interactive workflow pipeline statuses
+    status    String   @default("Suggested") // "Suggested", "Shortlisted", "Rejected"
+    createdAt DateTime @default(now()) @map("created_at")
+    updatedAt DateTime @updatedAt @map("updated_at")
+
+    // Constraints: Guarantees a candidate can only be evaluated once per client array
+    @@unique([clientId, candidateId])
+    @@map("matches")
+}
