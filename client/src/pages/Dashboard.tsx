@@ -96,13 +96,22 @@ const Dashboard = () => {
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-bold text-slate-900 dark:text-white">
-              Dashboard
-            </h1>
-            <p className="text-slate-500 dark:text-slate-400">
-              Welcome back to the Matchmaker Panel
-            </p>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <img
+                src="/src/assets/matchmaker-logo.png"
+                alt="MatchMaker"
+                className="h-8 w-auto"
+              />
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold text-slate-900 dark:text-white">
+                Dashboard
+              </h1>
+              <p className="text-slate-500 dark:text-slate-400">
+                Welcome back to the Matchmaker Panel
+              </p>
+            </div>
           </div>
           <Button
             variant="outline"
@@ -302,17 +311,17 @@ const Dashboard = () => {
                           </Badge>
                         </TableCell>
                         <TableCell className="text-right px-6">
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                aria-label="View client details"
-                                className="rounded-full transition-all duration-200 flex items-center gap-1.5 ml-auto bg-slate-50 text-slate-500 hover:bg-brand-50 hover:text-brand-600 hover:shadow-sm hover:scale-105 dark:bg-slate-800/50 dark:text-slate-400 dark:hover:bg-brand-900/30 dark:hover:text-brand-300 border border-transparent hover:border-brand-100 dark:hover:border-brand-800/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
-                              >
-                                <span className="font-semibold text-[13px]">
-                                  View Details
-                                </span>
-                                <ChevronRight className="w-4 h-4" />
-                              </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            aria-label="View client details"
+                            className="rounded-full transition-all duration-200 flex items-center gap-1.5 ml-auto bg-slate-50 text-slate-500 hover:bg-brand-50 hover:text-brand-600 hover:shadow-sm hover:scale-105 dark:bg-slate-800/50 dark:text-slate-400 dark:hover:bg-brand-900/30 dark:hover:text-brand-300 border border-transparent hover:border-brand-100 dark:hover:border-brand-800/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
+                          >
+                            <span className="font-semibold text-[13px]">
+                              View Details
+                            </span>
+                            <ChevronRight className="w-4 h-4" />
+                          </Button>
                         </TableCell>
                       </TableRow>
                     ))
