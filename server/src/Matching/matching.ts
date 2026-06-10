@@ -81,7 +81,7 @@ async function runMatchingPipeline(clientId: number, filter?: string) {
   }
 
   const oppositeGender = targetClient.gender === "Male" ? "Female" : "Male";
-  let candidatePool = [];
+  let candidatePool: any[] = [];
 
   // 3. Core Heuristic Database Filtration Pass
   if (targetClient.gender === "Male") {

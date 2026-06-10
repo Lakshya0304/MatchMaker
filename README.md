@@ -1,4 +1,4 @@
-# MAtchMaker Project
+# MatchMaker Project
 
 ## Overview
 
